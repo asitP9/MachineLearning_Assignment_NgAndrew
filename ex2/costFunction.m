@@ -20,11 +20,26 @@ grad = zeros(size(theta));
 % Note: grad should have the same dimensions as theta
 %
 
+z = X * theta;
+P = sigmoid (z);
+% s = size (P);
+% % Compute the cost term for y = 1
+% A = log (P);
+% % Compute the cost term for y = 0
+% B = log (ones(s) - P);
+% % Debugging matrix size
+% % sizeB = size(B)
+% % Combine into one term
+% C = y .* A + (ones(m) - y) .* B;
+% Debugging matrix size
+% sizeC = size(C)
+% Take sums and compute final cost function
 
+J = (-1 / m) * sum(y.*log(sigmoid(X * theta)) + (1 - y).*log(1 - sigmoid(X * theta)));
 
+%%% Derivatives or gradient
 
-
-
+grad = ((P - y)' * X )' ./ m;
 
 
 % =============================================================
