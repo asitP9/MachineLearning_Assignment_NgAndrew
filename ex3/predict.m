@@ -23,7 +23,15 @@ p = zeros(size(X, 1), 1);
 
 
 
+% Adding ones to the 1st column to take into account the bias factor
+X = [ones(m,1), X];
+% Dont forget the sigmoid function :)
+a2 = sigmoid(X * Theta1');
+% Adding ones to the 1st column to take into account the bias factor
+a2 = [ones(m,1), a2];
+h = sigmoid(a2 * Theta2');
 
+[prob, p] = max (h, [], 2);
 
 
 

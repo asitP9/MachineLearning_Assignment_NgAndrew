@@ -37,7 +37,25 @@ grad = zeros(size(theta));
 %
 
 
+h = sigmoid (X * theta);
 
+% Compute the cost term for y = 1
+A = log (h);
+% Compute the cost term for y = 0
+B = log (ones(m,1) - h);
+% Combine into one term
+C = y .* A + (ones(m,1) - y) .* B;
+
+% Take sums and compute final cost function
+J1 = -1 * sum(C) / (m);
+% Exclude the theta0 term from regularization
+J2 = lambda/(2*m) * (sum (theta .^ 2) - theta(1)^2);
+J = J1 + J2;
+
+%%% Derivatives or gradient
+
+grad = ((h - y)' * X )' ./ m + lambda/m * theta;
+grad(1) = grad(1) - lambda/m * theta(1);
 
 
 

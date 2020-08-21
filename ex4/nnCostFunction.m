@@ -1,4 +1,4 @@
-function [J grad] = nnCostFunction(nn_params, ...
+function [J, grad] = nnCostFunction(nn_params, ...
                                    input_layer_size, ...
                                    hidden_layer_size, ...
                                    num_labels, ...
@@ -63,21 +63,117 @@ Theta2_grad = zeros(size(Theta2));
 %
 
 
+% Adding ones to the 1st column to take into account the bias factor
+X = [ones(m,1), X];
+z2 = X * Theta1';
+
+% Cross checking size z2 = 5000x25
+% fprintf ('size(z2) '); 
+% disp(X);
+
+
+a2 = sigmoid(z2);
+% Adding ones to the 1st column to take into account the bias factor
+a2 = [ones(m,1), a2];
+% Cross checking size a2 = 5000x26
+% fprintf ('size(a2) ');
+% disp(a2);
+
+z3 = a2 * Theta2';
+% Cross checking size z3 = 5000x10
+% fprintf ('size(z3) ');
+% size(z3)
+
+h = sigmoid(z3);
+% Cross checking size h = 5000x10
+% fprintf ('size(h) ');
+% size(h)
+
+%%% 
+%%% y is in the form of 1,2,3, ... 10
+%%% Need to transform this into a vector denoting the value of the lettter
+%%% Example if y = 5; then vector will be [0,0,0,0,1,0,0,0,0,0]
+%%%
+
+y_new = zeros(m,num_labels);
+
+%%% For loop for this is very slow, hence implementing using vectorized notation with eye function
+for i = 1:m
+	y_new(i,y(i)) = 1;
+end
+% y_new = eye(num_labels)(y,:);
+
+
+%%% 
+%%% Now that output has been predicted and 
+%%% the y vector has been changed appropriately, 
+%%% lets compute the cost
+%%%
+
+% Compute the cost term for y = 1
+A = log (h);
+% Compute the cost term for y = 0
+B = log (ones(m,num_labels) - h);
+% Combine into one term
+C = y_new .* A + (ones(m,num_labels) - y_new) .* B;
+
+
+%%%
+%%% Take sums and compute final cost function
+%%%
+
+J1 = -1 * sum(sum(C)) / (m);
+
+%%% Add Regularization Term
+%%% Exclude the Bias term
+
+T1_exbias = Theta1(:, 2:end);
+T2_exbias = Theta2(:, 2:end);
+
+J2 = lambda/(2*m) * (sum(sum(T1_exbias .^ 2)) + sum(sum(T2_exbias .^ 2)) );
+
+J = J1 + J2;
 
 
 
+%%%
+%%% Implement Backpropagation to compute the gradients
+%%%
+
+%%% Steps 1 - 4 should be done over each training example inside for loop
+%%% Step 5 is done outside the for loop
+
+for i = 1:m
+	%%% Step 1: Perform a feedforward pass for this training example
+	% This was already done above, so I will simply reuse the values
+
+	%%% Step 2: Compute delta for layer 3 (output layer) for this training example
+	% Need to convert it into a column vector, hence taking transpose at the end
+	% delta3 = 10x1
+	delta3 = (h(i,:) - y_new(i,:))';
+	
+	%%% Step 3: Compute delta2 for hidden layer (l = 2) for this example
+	% For this need to make sure dimensions are correct
+	% Ignoring 1st term in Theta since bias activation is always 1
+	% delta2 = 25x1
+	delta2 = (Theta2(:,2:end)' * delta3) .* sigmoidGradient(z2(i,:)');
+	
+	%%% Step 4: Accumulate the gradient for this example
+	
+	Theta2_grad = Theta2_grad + delta3 * a2(i,:);
+	Theta1_grad = Theta1_grad + delta2 * X(i,:);
+		
+end
 
 
+%%% Step 5: Compute the final gradient value
+%%% Include Regularization (but not for Theta(0) terms
 
+T1_new = [zeros(size(T1_exbias,1),1),T1_exbias];
+T2_new = [zeros(size(T2_exbias,1),1),T2_exbias];
 
-
-
-
-
-
-
-
-
+Theta1_grad = Theta1_grad ./ m + lambda / m .* T1_new;
+Theta2_grad = Theta2_grad ./ m + lambda / m .* T2_new;
 
 
 % -------------------------------------------------------------
