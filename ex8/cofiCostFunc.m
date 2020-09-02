@@ -39,6 +39,20 @@ Theta_grad = zeros(size(Theta));
 %        Theta_grad - num_users x num_features matrix, containing the 
 %                     partial derivatives w.r.t. to each element of Theta
 %
+predict = X * Theta';
+
+% ... is used for line continuation.
+J = sum(sum( (  ((predict - Y).^2) .* R)  ))/2 ...
+						+ (sum (sum ( Theta .^ 2))) * lambda/2 ...
+						+ (sum (sum ( X .^ 2))) * lambda/2;
+
+
+% To make things easier, always think 
+% of this in terms of dimensions						
+X_grad = ((predict-Y).*R * Theta) + lambda * X;
+Theta_grad = (((predict-Y).* R)' * X) + lambda * Theta;
+
+% =============================================================
 
 
 

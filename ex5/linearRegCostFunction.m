@@ -18,19 +18,23 @@ grad = zeros(size(theta));
 %
 %               You should set J to the cost and grad to the gradient.
 %
+h=X*theta;
+squareActAndPred=(h-y).^2;
+sumOfSquareAct=sum(squareActAndPred);
+% firstPartOfSum= (1/(2*m))*sumOfSquareAct;
+firstPartOfSum= (1/(2*m))*sumOfSquareAct;
+
+secondPartOfSum=(lambda/(2*m))*(sum(theta.^2)-(theta(1).^2));
+
+J=firstPartOfSum+secondPartOfSum;
+% grad = ((h - y)' * X )' ./ m + lambda/m * theta;
+% grad(1) = grad(1) - lambda/m * theta(1);
 
 
-
-
-
-
-
-
-
-
-
-
+grad=(((h-y)'*X)'*(1/m))+((lambda/m)*theta);
+grad(1)=grad(1)-(lambda/m)*theta(1);
 % =========================================================================
+% disp(size(X));
 
 grad = grad(:);
 

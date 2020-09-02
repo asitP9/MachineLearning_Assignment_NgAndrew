@@ -28,7 +28,67 @@ centroids = zeros(K, n);
 
 
 
+% % Non Vectorized Implementation per exercise
+% % tic;
+% for i = 1:K
+	% sum = zeros(1,n);
+	% count = 0;
+	% for j = 1:m
+		% if (idx(j) == i)
+			% sum =  sum + X(j,:);
+			% count = count + 1;
+		% end
+		% if (count != 0)
+			% centroids(i,:) = sum / count;
+		% else
+			% centroids(i,:) = sum;
+		% end
+	% end
+% end
+% % toc;
+% % printf('Total cpu time for non-vectorized implementation: %f seconds\n', toc);
+% % Benchmark process:
+% % Expected: Total cpu time for non-vectorized implementation: 0.052037 seconds
 
+
+
+% % Vectorized implementation for faster algorithm
+% % tic;
+% for i = 1:K
+	% total = zeros(1,n);
+	% count = sum(idx == i);
+	% X_new = X .* (idx == i);
+	% total = sum(X_new, 1);
+	% % If count = 0, assign the centroid to origin
+	% % Ideally, this should be dropped from the K clusters to become K-1 clusters
+	% if (count != 0)
+		% centroids(i,:) = total / count;
+	% else
+		% centroids(i,:) = total;
+	% end
+% end
+% % toc;
+% % printf('Total cpu time for Vectorized implementation (1): %f seconds\n', toc);
+% % Benchmark process:
+% % Expected: Total cpu time for Vectorized implementation: 0.001000 seconds
+% % This is 50 times faster than non vectorized implementation
+
+% Another vectorized implementation which removes both for loops
+% If K is small such as 16, this will not take much less time than 
+% the vectorzed implementtion above
+% If K is large, this might be more efficient than the above implementation.
+% tic;
+I=eye(K);
+mat = I(idx, :)';
+% mat = eye(K)(idx,:)';
+count = sum (mat, 2);
+total = (mat * X);
+centroids = total ./ count;
+% toc; 
+% printf('Total cpu time for Vectorized implementation (2): %f seconds\n', toc);
+% Benchmark process:
+% Expected: Total cpu time for Vectorized implementation: 0.001000 seconds
+% This is 50 times faster than non vectorized implementation
 
 
 

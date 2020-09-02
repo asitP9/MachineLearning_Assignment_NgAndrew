@@ -22,7 +22,29 @@ sigma = 0.3;
 %  Note: You can compute the prediction error using 
 %        mean(double(predictions ~= yval))
 %
+Cvec = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30];
+sigmaVec = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30];
+cLen = length(Cvec);
+sigmaLen = length(sigmaVec);
+cost = zeros(cLen, sigmaLen);
+for i = 1:cLen
+	for j = 1:sigmaLen
+		fprintf('Finding the cost function for C = %f and sigma %f= \n', Cvec(i), sigmaVec(j));
+		C = Cvec(i);
+		sigma = sigmaVec(j);
+		% Train on X
+		model= svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma)); 
+		% Precict on Xval
+		predictions = svmPredict(model, Xval);
+		cost(i,j) = mean(double(predictions ~= yval));
+	end
+end
 
+[minval, row] = min(min(cost,[],2));
+[minval, col] = min(min(cost,[],1));
+
+C = Cvec(row);
+sigma = sigmaVec(col);
 
 
 

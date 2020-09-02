@@ -16,6 +16,7 @@ function [error_train, error_val] = ...
 
 % Number of training examples
 m = size(X, 1);
+mval = size(Xval, 1);
 
 % You need to return these values correctly
 error_train = zeros(m, 1);
@@ -50,6 +51,31 @@ error_val   = zeros(m, 1);
 %           
 %       end
 %
+J_train = 0;
+J_val = 0;
+for i = 1:m
+%   % Compute train/cross validation errors using training examples 
+%   % X(1:i, :) and y(1:i), storing the result in 
+%   % error_train(i) and error_val(i)
+%   ....
+	
+	[theta] = trainLinearReg([ones(i, 1), X(1:i, :)], y(1:i), lambda);
+	
+	% Note that Lambda is used to train the algorithm, but not used to calculate the Training and Crossvalidation error
+	% For J_train and J_cv, we only want to know the cost based on how well the 
+	% hypothesis fits the data. We don't want to add extra costs based on just the 
+	% theta values. 
+	% Regularization was included when we trained and learned the theta values. We 
+	% don't need to include it twice.
+	
+	% Also, complete cross validation set is used for all values of m
+		
+	[J_train, grad] = linearRegCostFunction([ones(i, 1) X(1:i, :)], y(1:i), theta, 0);  
+	error_train(i) = J_train;
+
+	[J_val, grad] = linearRegCostFunction([ones(mval, 1) Xval], yval, theta, 0);
+	error_val(i) = J_val;	
+		
 
 % ---------------------- Sample Solution ----------------------
 
